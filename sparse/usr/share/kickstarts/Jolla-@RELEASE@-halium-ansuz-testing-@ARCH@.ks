@@ -28,7 +28,7 @@ patterns-sailfish-device-configuration-halium-ansuz
 #Copy some files out of the image for the user to flash
 /boot/boot.img
 /boot/vendor_boot.img
-/boot/dtbo.img
+/boot/init_boot.img
 /etc/hw-release
 droid-config-halium-ansuz-out-of-image-files
 %end
