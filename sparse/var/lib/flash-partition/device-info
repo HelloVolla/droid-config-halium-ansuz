@@ -1,0 +1,23 @@
+CPUCHECK_STRING="MT6878"
+
+# Because of flash-partition checks, 1 needs to be defined
+# Others can go with partition numbers
+PART_1="boot_a"
+PART_52="boot_b"
+PART_31="dtbo_a"
+PART_58="dtbo_b"
+PART_29="vendor_boot_a"
+PART_53="vendor_boot_b"
+PART_27="lk_a"
+PART_51="lk_b"
+
+PART_REAL_1="sdc28"
+PART_REAL_52="sdc52"
+PART_REAL_31="sdc31"
+PART_REAL_58="sdc58"
+PART_REAL_29="sdc29"
+PART_REAL_53="sdc53"
+PART_REAL_27="sdc27"
+PART_REAL_51="sdc51"
+
+PART_I="1 52 31 58 29 53 27 51"
