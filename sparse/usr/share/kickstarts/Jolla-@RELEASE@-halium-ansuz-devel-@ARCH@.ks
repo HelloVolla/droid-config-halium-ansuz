@@ -11,7 +11,7 @@ part / --fstype="ext4" --size=7160 --label=root
 ## No suitable configuration found in /tmp/sandbox/usr/share/ssu/kickstart/bootloader
 
 repo --name=adaptation-community-ansuz-@RELEASE@ --baseurl=http://repo.sailfishos.org/obs/nemo:/devel:/hw:/volla:/halium-ansuz/sailfish_latest_@ARCH@/
-repo --name=adaptation-community-halium13-@RELEASE@ --baseurl=http://repo.sailfishos.org/obs/nemo:/devel:/hw:/halium:/13/sailfish_latest_@ARCH@/
+repo --name=adaptation-community-halium13-@RELEASE@ --baseurl=http://repo.sailfishos.org/obs/nemo:/devel:/hw:/halium:/14/sailfish_latest_@ARCH@/
 repo --name=adaptation-community-common-@RELEASE@ --baseurl=http://repo.sailfishos.org/obs/nemo:/devel:/hw:/common/sailfish_latest_@ARCH@/
 
 repo --name=sailfishos-chum-@RELEASEMAJMIN@ --baseurl=http://repo.sailfishos.org/obs/sailfishos:/chum/@RELEASEMAJMIN@_@ARCH@/
@@ -101,65 +101,6 @@ then
     ssu domain sailfish
 fi
 ### end 70_sdk-domain
-
-### Group_setup
-
-int_groupadd() {
-  name=$1
-  id=$2
-
-  if ! getent group $name; then
-        if getent group $id; then
-            other_name=$(getent group $id 2>/dev/null |cut -d":" -f1)
-            echo "Group $name did not exist yet, but another group has the same id ($id, $other_name), renaming that group"
-            groupmod -g $id -n $name $other_name || :
-        else
-            echo "Group $name did not exist yet"
-            groupadd -g $id $name || :
-        fi
-    else
-        echo "Group $name already existed, modifying it"
-        groupmod -g $id $name || :
-    fi
-}
-
-#Add Android groups/users
-int_groupadd system      1000
-int_groupadd radio       1001
-int_groupadd bluetooth   1002
-int_groupadd graphics    1003
-int_groupadd input       1004
-int_groupadd audio       1005
-int_groupadd camera      1006
-int_groupadd log         1007
-int_groupadd compass     1008
-int_groupadd mount       1009
-int_groupadd wifi        1010
-int_groupadd adb         1011
-int_groupadd install     1012
-int_groupadd media       1013
-int_groupadd dhcp        1014
-int_groupadd drm         1019
-int_groupadd gps         1021
-int_groupadd nfc         1027
-int_groupadd shell       2000
-int_groupadd cache       2001
-int_groupadd diag        2002
-int_groupadd net_bt_admin   3001
-int_groupadd net_bt      3002
-int_groupadd inet        3003
-int_groupadd net_raw     3004
-int_groupadd misc        9998
-
-useradd system --uid 1000 -g system -r -s /sbin/nologin
-useradd radio --uid 1001 -g radio -r -s /sbin/nologin
-useradd bluetooth --uid 1002 -g bluetooth -r -s /sbin/nologin
-useradd wifi --uid 1010 -g wifi -r -s /sbin/nologin
-useradd media --uid 1013 -g media -r -s /sbin/nologin
-useradd drm --uid 1019 -g drm -r -s /sbin/nologin
-useradd gps --uid 1021 -g gps -r -s /sbin/nologin
-useradd nfc --uid 1027 -g nfc -r -s /sbin/nologin
-### end group_setup
 
 touch /.writable_image
 %end
