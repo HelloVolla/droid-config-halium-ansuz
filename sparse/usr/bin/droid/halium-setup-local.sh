@@ -35,3 +35,21 @@ for apex in /android/system/apex/*.apex /android/system/system_ext/apex/*.apex; 
     mkdir -p "$target"
     mount -o loop,ro,offset="$offset" "$apex" "$target"
 done
+
+# setgid clients such as lipstick drop HYBRIS_LD_LIBRARY_PATH and only get the
+# built-in libhybris path, which starts with the droid-hybris dir. Link there
+# whatever the compositor path adds on top of /system and /vendor.
+hybris_dir=/run/droid-hybris/lib64
+hybris_path=$(sed -n "s/^HYBRIS_LD_LIBRARY_PATH=//p" /var/lib/environment/compositor/droid-hal-device.conf)
+mkdir -p $hybris_dir
+for dir in $(echo "$hybris_path" | tr ":" " "); do
+    [ "$dir" = /system/lib64 ] && continue
+    for lib in "$dir"/*.so; do
+        [ -e "$lib" ] || continue
+        name=$(basename "$lib")
+        if [ -e "/system/lib64/$name" ] || [ -e "/vendor/lib64/$name" ] || [ -e "$hybris_dir/$name" ]; then
+            continue
+        fi
+        ln -s "$lib" "$hybris_dir/$name"
+    done
+done
