@@ -25,15 +25,15 @@ while [ ! -e /dev/socket/property_service ]; do sleep 0.1; done
 while [ "$(getprop vendor.service.nvram_init)" != "Ready" ]; do sleep 0.2; done
 
 
-# Load device-specific connectivity kernel modules starting with WLAN
-modprobe wmt_chrdev_wifi
-modprobe wlan_drv_gen4m_6789
+# The WLAN driver lives in vendor_dlkm, outside the host's module tree.
+# mac80211 needs libarc4 from system_dlkm.
+modprobe -q libarc4
+for mod in cfg80211 mac80211 wlan_drv_gen4m_6878; do
+    insmod /vendor_dlkm/lib/modules/$mod.ko 2>/dev/null
+done
 
 # Silence all wlan debug logging down to just errors/warnings
 printf '0xFF:0x03' > /proc/net/wlan/dbgLevel
-
-# Load other connectivity kernel modules as well now
-modprobe fmradio_drv_mt6631_6635
 
 # Wait for nvram yet again..
 while [ "$(getprop vendor.mtk.nvram.ready)" != "1" ]; do sleep 0.2; done
@@ -45,7 +45,7 @@ while [ ! -c /dev/wmtWifi ]; do sleep 0.2; done
 sleep 1
 
 # Finally enable the adapter in station mode
-echo S > /dev/wmtWifi
+echo P > /dev/wmtWifi
 
 
 # Enable WoWLAN to avoid network disconnect before suspend
