@@ -1,1 +1,0 @@
-SUBSYSTEM=="input", ATTRS{name}=="fts_ts", SYMLINK+="touchscreen"
