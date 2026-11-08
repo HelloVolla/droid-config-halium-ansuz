@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#Temp debug
+/usr/bin/droid/usb_tethering&
+exit 0
+
 #Set up configfs as we are not using droid-boot init-script
 USB_DRIVER=ncm
 USB_FUNCTIONS=$USB_DRIVER,mtp
