@@ -1,0 +1,41 @@
+#!/bin/sh
+# Shadows the community generator of the same name in /usr/lib.
+# A rootfs reflash with userdata kept loses config.ini, and the wizard
+# would then recreate a home that is still a LUKS container. Mark such
+# devices encrypted so they get unlocked, then run the real generator.
+
+conf_dir=/etc/sailfish-device-encryption-community
+generator=/usr/lib/systemd/system-generators/sailfish-device-encryption-community-generator
+
+ini_value() {
+    awk -F= -v group="[$2]" -v key="$3" '
+        /^\[/ { in_group = ($0 == group); next }
+        in_group && $1 == key { print substr($0, length(key) + 2); exit }
+    ' "$1" 2>/dev/null
+}
+
+mark_encrypted() {
+    config=$conf_dir/config.ini
+    [ -f $config ] || : > $config
+
+    awk -v group="[$1]" '
+        { print }
+        $0 == group { print "state=encrypted"; found = 1 }
+        END { if (!found) { print group; print "state=encrypted" } }
+    ' $config > $config.tmp && mv $config.tmp $config
+}
+
+adopt_luks_devices() {
+    for group in $(sed -n 's/^\[\(.*\)\]$/\1/p' $conf_dir/devices.ini 2>/dev/null); do
+        [ -z "$(ini_value $conf_dir/config.ini $group state)" ] || continue
+
+        device=$(ini_value $conf_dir/devices.ini $group device)
+        [ -e "$device" ] || continue
+        /usr/sbin/cryptsetup isLuks "$device" || continue
+
+        mark_encrypted $group
+    done
+}
+
+adopt_luks_devices
+exec $generator "$@"

@@ -1,0 +1,1 @@
+# Disable in favor of AIDL bluetooth_hal_service (and to unbreak bluebinder_wait.sh)
